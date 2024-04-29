@@ -1,0 +1,11 @@
+Player1:12389
+Player2:32442
+Player3:33323
+Player4:15000
+Player5:84342
+Player6:12333
+Player7:99999
+Player8:26743
+Player9:94753
+Player10:58392
+eee:0
