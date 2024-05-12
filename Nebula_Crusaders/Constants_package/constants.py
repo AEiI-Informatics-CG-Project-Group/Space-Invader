@@ -17,5 +17,14 @@ else:
 # Players sprite group
 players = pygame.sprite.Group()
 
+# Guns sprite group
+guns = pygame.sprite.Group()
+
 # Enemies sprite group
 enemies = pygame.sprite.Group()
+
+# Enemies laser guns sprite group
+enemies_laser_guns = pygame.sprite.Group()
+
+# Bonuses sprite group
+bonuses = pygame.sprite.Group()
