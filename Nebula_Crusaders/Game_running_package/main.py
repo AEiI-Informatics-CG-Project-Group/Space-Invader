@@ -2,30 +2,48 @@ import pygame
 import threading
 import re
 
-from Game_running_package.fonts import font_100, font_75, font_50, font_35
+from Game_running_package.fonts import font_100, font_75, font_60, font_50, font_35, font_25
 
-from Game_running_package.messages_fullscreen import display_score, display_timer, display_hp, display_leader_board, display_user_input_nickname, welcome_m, welcome_mR, nebula_m, nebula_mR, controls_m, \
+from Game_running_package.messages_fullscreen import display_score, display_timer, display_hp, display_stats, \
+    display_gun, display_gun_availability, display_leader_board, display_user_input_nickname, warning_m, warning_mR, \
+    star_lord_announcement_m, star_lord_announcement_mR, bounty_hunter_announcement_m, bounty_hunter_announcement_mR, \
+    ghast_of_the_void_announcement_m, ghast_of_the_void_announcement_mR, galactic_devourer_announcement_m, \
+    galactic_devourer_announcement_mR, galactic_devourer_announcement_m2, galactic_devourer_announcement_mR2, \
+    boss_rush_announcement_m, boss_rush_announcement_mR, welcome_m, welcome_mR, nebula_m, nebula_mR, controls_m, \
     controls_mR, controls_m1, controls_mR1, controls_m1C, controls_mR1C, controls_m2, controls_mR2, controls_m2C, \
     controls_mR2C, controls_m3, controls_mR3, controls_m3C, controls_mR3C, to_play_m, to_play_mR, to_leave_m, \
     to_leave_mR, enter_nickname_m, enter_nickname_mR, incorrect_nickname, incorrect_nicknameR, leaderboard_m, \
     leaderboard_mR, to_play_leaderboard_m, to_play_leaderboard_mR
 
-from Game_running_package.messages_windowed import display_scoreW, display_timerW, display_hpW, display_user_input_nicknameW, display_leader_boardW, welcome_mW,\
+from Game_running_package.messages_windowed import display_scoreW, display_timerW, display_hpW, display_statsW, \
+    display_gunW, display_gun_availabilityW, display_user_input_nicknameW, display_leader_boardW, warning_mW, \
+    warning_mRW, star_lord_announcement_mW, star_lord_announcement_mRW, bounty_hunter_announcement_mW, \
+    bounty_hunter_announcement_mRW, ghast_of_the_void_announcement_mW, ghast_of_the_void_announcement_mRW, \
+    galactic_devourer_announcement_mW, galactic_devourer_announcement_mRW, galactic_devourer_announcement_m2W, \
+    galactic_devourer_announcement_mR2W, boss_rush_announcement_mW, boss_rush_announcement_mRW, welcome_mW,\
     welcome_mRW, nebula_mW, nebula_mRW, controls_mW, controls_mRW, controls_m1W, controls_mR1W, controls_m1CW, \
     controls_mR1CW, controls_m2W, controls_mR2W, controls_m2CW, controls_mR2CW, controls_m3W, controls_mR3W, \
     controls_m3CW, controls_mR3CW, to_play_mW, to_play_mRW, to_leave_mW, to_leave_mRW, enter_nickname_mW, \
     enter_nickname_mRW, incorrect_nicknameW, incorrect_nicknameRW, leaderboard_mW, leaderboard_mRW, \
     to_play_leaderboard_mW, to_play_leaderboard_mRW
 
-from Constants_package.constants import players, enemies, SCREEN_WIDTH, SCREEN_HEIGHT, fullscreen_flag
+from Constants_package.constants import players, enemies, guns, bonuses, enemies_laser_guns, \
+    SCREEN_WIDTH, SCREEN_HEIGHT, fullscreen_flag
 
 from game_flags import game_over_flag, game_running_flag, game_first_run_flag, user_enters_nickname_flag, \
-    incorrect_nickname_flag, asteroids_arrived_flag, first_stardust_wave_flag
+    incorrect_nickname_flag, asteroids_arrived_flag, star_lord_arrived_flag, bounty_hunter_arrived_flag, \
+    ghast_of_the_void_arrived_flag, galactic_devourer_arrived_flag, \
+    boss_rush_arrived_flag1, boss_rush_arrived_flag2, boss_rush_arrived_flag3, \
+    first_stardust_wave_flag, second_stardust_wave_flag, third_stardust_wave_flag, fourth_stardust_wave_flag
 
 from Player_package.player import Player
 
 from Enemies_package.asteroid import Asteroid
 from Enemies_package.stardust import Stardust
+from Enemies_package.star_lord import Star_lord
+from Enemies_package.bounty_hunter import Bounty_hunter
+from Enemies_package.ghast_of_the_void import Ghast_of_the_void
+from Enemies_package.galactic_devourer import Galactic_devourer
 
 pygame.init()
 
@@ -95,10 +113,20 @@ def gameplay_HUD(fullscreen):
         display_score(player.score, SCREEN_WIDTH / 2, 75, '#FCFCF4', font_100, screen)
         display_timer(game_timer, SCREEN_WIDTH / 2, 170, '#FCFCF4', font_75, screen)
         display_hp(player.hp, SCREEN_WIDTH - 180, SCREEN_HEIGHT - 60, '#FCFCF4', font_100, screen)
+        display_stats(player.speed, player.gun_damage_multiplier, player.gun_fire_rate_multiplier, 275,
+                      SCREEN_HEIGHT - 180, '#FCFCF4', font_60, screen)
+        display_gun(player.using_gun_type, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 70, '#FCFCF4', font_50, screen)
+        display_gun_availability(player.minigun, player.laser_rifle, player.rocket_launcher, player.laser_ring,
+                                 player.sniper_rifle, player.laser_thrower, screen)
     else:
         display_scoreW(player.score, 640, 30, '#FCFCF4', font_50, screen)
         display_timerW(game_timer, 640, 70, '#FCFCF4', font_35, screen)
         display_hpW(player.hp, 1200, 765, '#FCFCF4', font_50, screen)
+        display_statsW(player.speed, player.gun_damage_multiplier, player.gun_fire_rate_multiplier, 110, 720,
+                       '#FCFCF4', font_25, screen)
+        display_gunW(player.using_gun_type, 640, 765, '#FCFCF4', font_25, screen)
+        display_gun_availabilityW(player.minigun, player.laser_rifle, player.rocket_launcher, player.laser_ring,
+                                  player.sniper_rifle, player.laser_thrower, screen)
 
 
 # Entering nickname screen
@@ -145,18 +173,27 @@ def leaderboard_screen(fullscreen):
 
 
 def reset_game():
+    guns.empty()
     enemies.empty()
+    enemies_laser_guns.empty()
+    bonuses.empty()
     players.empty()
 
 
 def draw_sprites():
+    guns.draw(screen)
     players.draw(screen)
     enemies.draw(screen)
+    enemies_laser_guns.draw(screen)
+    bonuses.draw(screen)
 
 
 def update_sprites():
+    guns.update()
     players.update()
     enemies.update()
+    enemies_laser_guns.update()
+    bonuses.update()
 
 
 reset_game_thread = threading.Thread(target=reset_game)
@@ -187,7 +224,17 @@ while not game_over_flag:
                 showing_leaderboard_flag = False
                 incorrect_nickname_flag = False
                 asteroids_arrived_flag = False
+                star_lord_arrived_flag = False
+                bounty_hunter_arrived_flag = False
+                ghast_of_the_void_arrived_flag = False
+                galactic_devourer_arrived_flag = False
+                boss_rush_arrived_flag1 = False
+                boss_rush_arrived_flag2 = False
+                boss_rush_arrived_flag3 = False
                 first_stardust_wave_flag = False
+                second_stardust_wave_flag = False
+                third_stardust_wave_flag = False
+                fourth_stardust_wave_flag = False
 
                 game_timer = 0
 
@@ -232,7 +279,17 @@ while not game_over_flag:
                         showing_leaderboard_flag = False
                         incorrect_nickname_flag = False
                         asteroids_arrived_flag = False
+                        star_lord_arrived_flag = False
+                        bounty_hunter_arrived_flag = False
+                        ghast_of_the_void_arrived_flag = False
+                        galactic_devourer_arrived_flag = False
+                        boss_rush_arrived_flag1 = False
+                        boss_rush_arrived_flag2 = False
+                        boss_rush_arrived_flag3 = False
                         first_stardust_wave_flag = False
+                        second_stardust_wave_flag = False
+                        third_stardust_wave_flag = False
+                        fourth_stardust_wave_flag = False
 
                         game_timer = 0
 
@@ -270,13 +327,180 @@ while not game_over_flag:
                 enemies.add(asteroid)
                 adding_enemies_mutex.release()
 
-        if game_timer >= 30 * SECOND and not first_stardust_wave_flag:
+        if 40 * SECOND <= game_timer <= 45 * SECOND:
+            if fullscreen_flag:
+                screen.blit(warning_m, warning_mR)
+                screen.blit(star_lord_announcement_m, star_lord_announcement_mR)
+            else:
+                screen.blit(warning_mW, warning_mRW)
+                screen.blit(star_lord_announcement_mW, star_lord_announcement_mRW)
+
+        if game_timer >= 45 * SECOND and not star_lord_arrived_flag:
+            star_lord_arrived_flag = True
+            star_lord = Star_lord()
+            adding_enemies_mutex.acquire()
+            enemies.add(star_lord)
+            adding_enemies_mutex.release()
+
+        if game_timer >= 80 * SECOND and not first_stardust_wave_flag:
             first_stardust_wave_flag = True
             for i in range(50):
                 stardust = Stardust()
                 adding_enemies_mutex.acquire()
                 enemies.add(stardust)
                 adding_enemies_mutex.release()
+
+        if 85 * SECOND <= game_timer <= 90 * SECOND:
+            if fullscreen_flag:
+                screen.blit(warning_m, warning_mR)
+                screen.blit(bounty_hunter_announcement_m, bounty_hunter_announcement_mR)
+            else:
+                screen.blit(warning_mW, warning_mRW)
+                screen.blit(bounty_hunter_announcement_mW, bounty_hunter_announcement_mRW)
+
+        if game_timer >= 90 * SECOND and not bounty_hunter_arrived_flag:
+            bounty_hunter_arrived_flag = True
+            bounty_hunter = Bounty_hunter()
+            adding_enemies_mutex.acquire()
+            enemies.add(bounty_hunter)
+            adding_enemies_mutex.release()
+
+        if game_timer >= 125 * SECOND and not second_stardust_wave_flag:
+            second_stardust_wave_flag = True
+            for i in range(100):
+                stardust = Stardust()
+                adding_enemies_mutex.acquire()
+                enemies.add(stardust)
+                adding_enemies_mutex.release()
+
+        if 130 * SECOND <= game_timer <= 135 * SECOND:
+            if fullscreen_flag:
+                screen.blit(warning_m, warning_mR)
+                screen.blit(ghast_of_the_void_announcement_m, ghast_of_the_void_announcement_mR)
+            else:
+                screen.blit(warning_mW, warning_mRW)
+                screen.blit(ghast_of_the_void_announcement_mW, ghast_of_the_void_announcement_mRW)
+
+        if game_timer >= 135 * SECOND and not ghast_of_the_void_arrived_flag:
+            ghast_of_the_void_arrived_flag = True
+            ghast_of_the_void = Ghast_of_the_void(SCREEN_HEIGHT / 16, SCREEN_HEIGHT / 16, 1, True)
+            adding_enemies_mutex.acquire()
+            enemies.add(ghast_of_the_void)
+            adding_enemies_mutex.release()
+
+        if game_timer >= 170 * SECOND and not third_stardust_wave_flag:
+            third_stardust_wave_flag = True
+            for i in range(150):
+                stardust = Stardust()
+                adding_enemies_mutex.acquire()
+                enemies.add(stardust)
+                adding_enemies_mutex.release()
+
+        if 175 * SECOND <= game_timer <= 180 * SECOND:
+            if fullscreen_flag:
+                screen.blit(warning_m, warning_mR)
+                screen.blit(galactic_devourer_announcement_m, galactic_devourer_announcement_mR)
+                screen.blit(galactic_devourer_announcement_m2, galactic_devourer_announcement_mR2)
+            else:
+                screen.blit(warning_mW, warning_mRW)
+                screen.blit(galactic_devourer_announcement_mW, galactic_devourer_announcement_mRW)
+                screen.blit(galactic_devourer_announcement_m2W, galactic_devourer_announcement_mR2W)
+
+        if game_timer >= 180 * SECOND and not galactic_devourer_arrived_flag:
+            galactic_devourer_arrived_flag = True
+            galactic_devourer = Galactic_devourer()
+            adding_enemies_mutex.acquire()
+            enemies.add(galactic_devourer)
+            adding_enemies_mutex.release()
+
+        if game_timer >= 215 * SECOND and not fourth_stardust_wave_flag:
+            fourth_stardust_wave_flag = True
+            for i in range(200):
+                stardust = Stardust()
+                adding_enemies_mutex.acquire()
+                enemies.add(stardust)
+                adding_enemies_mutex.release()
+
+        if 220 * SECOND <= game_timer <= 225 * SECOND:
+            if fullscreen_flag:
+                screen.blit(warning_m, warning_mR)
+                screen.blit(boss_rush_announcement_m, boss_rush_announcement_mR)
+            else:
+                screen.blit(warning_mW, warning_mRW)
+                screen.blit(boss_rush_announcement_mW, boss_rush_announcement_mRW)
+
+        if game_timer >= 225 * SECOND and not boss_rush_arrived_flag1:
+            boss_rush_arrived_flag1 = True
+            star_lord1 = Star_lord()
+            adding_enemies_mutex.acquire()
+            enemies.add(star_lord1)
+            adding_enemies_mutex.release()
+            bounty_hunter1 = Bounty_hunter()
+            adding_enemies_mutex.acquire()
+            enemies.add(bounty_hunter1)
+            adding_enemies_mutex.release()
+            ghast_of_the_void1 = Ghast_of_the_void()
+            adding_enemies_mutex.acquire()
+            enemies.add(ghast_of_the_void1)
+            adding_enemies_mutex.release()
+            galactic_devourer1 = Galactic_devourer()
+            adding_enemies_mutex.acquire()
+            enemies.add(galactic_devourer1)
+            adding_enemies_mutex.release()
+
+        if 165 * SECOND <= game_timer <= 270 * SECOND:
+            if fullscreen_flag:
+                screen.blit(warning_m, warning_mR)
+                screen.blit(boss_rush_announcement_m, boss_rush_announcement_mR)
+            else:
+                screen.blit(warning_mW, warning_mRW)
+                screen.blit(boss_rush_announcement_mW, boss_rush_announcement_mRW)
+
+        if game_timer >= 270 * SECOND and not boss_rush_arrived_flag2:
+            boss_rush_arrived_flag2 = True
+            star_lord2 = Star_lord()
+            adding_enemies_mutex.acquire()
+            enemies.add(star_lord2)
+            adding_enemies_mutex.release()
+            bounty_hunter2 = Bounty_hunter()
+            adding_enemies_mutex.acquire()
+            enemies.add(bounty_hunter2)
+            adding_enemies_mutex.release()
+            ghast_of_the_void2 = Ghast_of_the_void()
+            adding_enemies_mutex.acquire()
+            enemies.add(ghast_of_the_void2)
+            adding_enemies_mutex.release()
+            galactic_devourer2 = Galactic_devourer()
+            adding_enemies_mutex.acquire()
+            enemies.add(galactic_devourer2)
+            adding_enemies_mutex.release()
+
+        if 310 * SECOND <= game_timer <= 315 * SECOND:
+            if fullscreen_flag:
+                screen.blit(warning_m, warning_mR)
+                screen.blit(boss_rush_announcement_m, boss_rush_announcement_mR)
+            else:
+                screen.blit(warning_mW, warning_mRW)
+                screen.blit(boss_rush_announcement_mW, boss_rush_announcement_mRW)
+
+        if game_timer >= 315 * SECOND and not boss_rush_arrived_flag3:
+            boss_rush_arrived_flag3 = True
+            star_lord3 = Star_lord()
+            adding_enemies_mutex.acquire()
+            enemies.add(star_lord3)
+            adding_enemies_mutex.release()
+            bounty_hunter3 = Bounty_hunter()
+            adding_enemies_mutex.acquire()
+            enemies.add(bounty_hunter3)
+            adding_enemies_mutex.release()
+            ghast_of_the_void3 = Ghast_of_the_void()
+            adding_enemies_mutex.acquire()
+            enemies.add(ghast_of_the_void3)
+            adding_enemies_mutex.release()
+            galactic_devourer3 = Galactic_devourer()
+            adding_enemies_mutex.acquire()
+            enemies.add(galactic_devourer3)
+            adding_enemies_mutex.release()
 
         if game_timer >= 360 * SECOND:
             game_running_flag = False
