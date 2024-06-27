@@ -176,17 +176,26 @@ controls_mR1W = controls_m1W.get_rect(center=(380, 425))
 controls_m1CW = font_30.render('< ↑ > ↓', False, '#FCFCF4')
 controls_mR1CW = controls_m1CW.get_rect(center=(380, 475))
 
+controls_pad1 = font_30.render('Left analog', False, '#FCFCF4')
+controls_pad1W = controls_pad1.get_rect(center=(360, 520))
+
 controls_m2W = font_30.render('Switching guns:', False, '#FCFCF4')
 controls_mR2W = controls_m2W.get_rect(center=(SCREEN_WIDTH / 2, 425))
 
 controls_m2CW = font_30.render('1 2 3 4 5 6', False, '#FCFCF4')
 controls_mR2CW = controls_m2CW.get_rect(center=(SCREEN_WIDTH / 2, 475))
 
+controls_pad2 = font_30.render('< ↑ > ↓ R1 L1', False, '#FCFCF4')
+controls_pad2W = controls_pad2.get_rect(center=(SCREEN_WIDTH / 2, 520))
+
 controls_m3W = font_30.render('Shooting:', False, '#FCFCF4')
 controls_mR3W = controls_m3W.get_rect(center=(900, 425))
 
 controls_m3CW = font_30.render('SPACE', False, '#FCFCF4')
 controls_mR3CW = controls_m3CW.get_rect(center=(900, 475))
+
+controls_pad3 = font_30.render('X', False, '#FCFCF4')
+controls_pad3W = controls_pad3.get_rect(center=(900, 520))
 
 to_play_mW = font_50.render('Press SPACE to play!', False, '#FCFCF4')
 to_play_mRW = to_play_mW.get_rect(center=(SCREEN_WIDTH / 2, 600))

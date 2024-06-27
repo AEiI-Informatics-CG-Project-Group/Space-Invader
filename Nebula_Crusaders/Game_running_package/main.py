@@ -1,7 +1,8 @@
 import pygame
+
+
 import threading
 import re
-
 from Game_running_package.fonts import font_100, font_75, font_60, font_50, font_35, font_25
 
 from Game_running_package.messages_fullscreen import display_score, display_timer, display_hp, display_stats, \
@@ -13,7 +14,8 @@ from Game_running_package.messages_fullscreen import display_score, display_time
     controls_mR, controls_m1, controls_mR1, controls_m1C, controls_mR1C, controls_m2, controls_mR2, controls_m2C, \
     controls_mR2C, controls_m3, controls_mR3, controls_m3C, controls_mR3C, to_play_m, to_play_mR, to_leave_m, \
     to_leave_mR, enter_nickname_m, enter_nickname_mR, incorrect_nickname, incorrect_nicknameR, leaderboard_m, \
-    leaderboard_mR, to_play_leaderboard_m, to_play_leaderboard_mR
+    leaderboard_mR, to_play_leaderboard_m, to_play_leaderboard_mR, controls_pad1f, controls_pad1F, controls_pad2f, \
+    controls_pad2F, controls_pad3f, controls_pad3F
 
 from Game_running_package.messages_windowed import display_scoreW, display_timerW, display_hpW, display_statsW, \
     display_gunW, display_gun_availabilityW, display_user_input_nicknameW, display_leader_boardW, warning_mW, \
@@ -25,10 +27,10 @@ from Game_running_package.messages_windowed import display_scoreW, display_timer
     controls_mR1CW, controls_m2W, controls_mR2W, controls_m2CW, controls_mR2CW, controls_m3W, controls_mR3W, \
     controls_m3CW, controls_mR3CW, to_play_mW, to_play_mRW, to_leave_mW, to_leave_mRW, enter_nickname_mW, \
     enter_nickname_mRW, incorrect_nicknameW, incorrect_nicknameRW, leaderboard_mW, leaderboard_mRW, \
-    to_play_leaderboard_mW, to_play_leaderboard_mRW
+    to_play_leaderboard_mW, to_play_leaderboard_mRW, controls_pad1, controls_pad1W, controls_pad2, controls_pad2W, \
+    controls_pad3, controls_pad3W
 
-from Constants_package.constants import players, enemies, guns, bonuses, enemies_laser_guns, \
-    SCREEN_WIDTH, SCREEN_HEIGHT, fullscreen_flag
+from Constants_package.constants import players, enemies, guns, bonuses, enemies_laser_guns, SCREEN_WIDTH, SCREEN_HEIGHT, fullscreen_flag
 
 from game_flags import game_over_flag, game_running_flag, game_first_run_flag, user_enters_nickname_flag, \
     incorrect_nickname_flag, asteroids_arrived_flag, star_lord_arrived_flag, bounty_hunter_arrived_flag, \
@@ -45,6 +47,12 @@ from Enemies_package.bounty_hunter import Bounty_hunter
 from Enemies_package.ghast_of_the_void import Ghast_of_the_void
 from Enemies_package.galactic_devourer import Galactic_devourer
 
+from background import BG  # Import the BG class
+
+from random import choice, randint, uniform
+
+particle_group = pygame.sprite.Group()
+
 pygame.init()
 
 # Game clock
@@ -60,62 +68,48 @@ player_score_map_output = {}
 
 # Screen
 if fullscreen_flag:
-    screen_background_position = (0, 0)
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
-    background_graphics = pygame.image.load('Additional_resources/Graphics/background_f.png').convert()
 else:
-    screen_background_position = (0, 0)
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-    background_graphics = pygame.image.load('Additional_resources/Graphics/background_w.png').convert()
 
 pygame.display.set_caption('Nebula Crusaders')
 pygame.mouse.set_visible(False)
 
+# Initialize the dynamic background
+background = BG()
+
 # Game Audio
-background_audio = pygame.mixer.Sound("Additional_resources/Audio/main_theme.mp3")
+background_audio = pygame.mixer.Sound("Audio/main_theme.mp3")
 background_audio.play(loops=-1)
 background_audio.set_volume(0.2)
+
+# Load static menu image
+menu_image_original = pygame.image.load('Graphics/Menu.jpg')
+if fullscreen_flag:
+    menu_image = pygame.transform.scale(menu_image_original, (1920, 1080))
+else:
+    menu_image = pygame.transform.scale(menu_image_original, (1280, 800))
+
+menu_image_rect = menu_image.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+
 
 
 # Welcome screen
 def welcome_screen(fullscreen):
-    if fullscreen:
-        screen.blit(background_graphics, screen_background_position)
-        screen.blit(welcome_m, welcome_mR)
-        screen.blit(nebula_m, nebula_mR)
-        screen.blit(controls_m, controls_mR)
-        screen.blit(controls_m1, controls_mR1)
-        screen.blit(controls_m1C, controls_mR1C)
-        screen.blit(controls_m2, controls_mR2)
-        screen.blit(controls_m2C, controls_mR2C)
-        screen.blit(controls_m3, controls_mR3)
-        screen.blit(controls_m3C, controls_mR3C)
-        screen.blit(to_play_m, to_play_mR)
-        screen.blit(to_leave_m, to_leave_mR)
-    else:
-        screen.blit(background_graphics, screen_background_position)
-        screen.blit(welcome_mW, welcome_mRW)
-        screen.blit(nebula_mW, nebula_mRW)
-        screen.blit(controls_mW, controls_mRW)
-        screen.blit(controls_m1W, controls_mR1W)
-        screen.blit(controls_m1CW, controls_mR1CW)
-        screen.blit(controls_m2W, controls_mR2W)
-        screen.blit(controls_m2CW, controls_mR2CW)
-        screen.blit(controls_m3W, controls_mR3W)
-        screen.blit(controls_m3CW, controls_mR3CW)
-        screen.blit(to_play_mW, to_play_mRW)
-        screen.blit(to_leave_mW, to_leave_mRW)
+    background.update()  # Update background
+    screen.blit(background.image, background.rect)  # Draw background
+    screen.blit(menu_image, menu_image_rect)
 
 
 # Gameplay HUD screen
 def gameplay_HUD(fullscreen):
     if fullscreen:
-        display_score(player.score, SCREEN_WIDTH / 2, 75, '#FCFCF4', font_100, screen)
-        display_timer(game_timer, SCREEN_WIDTH / 2, 170, '#FCFCF4', font_75, screen)
-        display_hp(player.hp, SCREEN_WIDTH - 180, SCREEN_HEIGHT - 60, '#FCFCF4', font_100, screen)
-        display_stats(player.speed, player.gun_damage_multiplier, player.gun_fire_rate_multiplier, 275,
-                      SCREEN_HEIGHT - 180, '#FCFCF4', font_60, screen)
-        display_gun(player.using_gun_type, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 70, '#FCFCF4', font_50, screen)
+        display_score(player.score, SCREEN_WIDTH / 2, 75, '#FCFCF4', font_75, screen)
+        display_timer(game_timer, SCREEN_WIDTH / 2, 170, '#FCFCF4', font_50, screen)
+        display_hp(player.hp, SCREEN_WIDTH - 180, SCREEN_HEIGHT - 60, '#FCFCF4', font_35, screen)
+        display_stats(player.speed, player.gun_damage_multiplier, player.gun_fire_rate_multiplier, 250,
+                      SCREEN_HEIGHT - 180, '#FCFCF4', font_35, screen)
+        display_gun(player.using_gun_type, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 70, '#FCFCF4', font_35, screen)
         display_gun_availability(player.minigun, player.laser_rifle, player.rocket_launcher, player.laser_ring,
                                  player.sniper_rifle, player.laser_thrower, screen)
     else:
@@ -131,15 +125,15 @@ def gameplay_HUD(fullscreen):
 
 # Entering nickname screen
 def enter_nickname_screen(fullscreen):
+    background.update()  # Update background
+    screen.blit(background.image, background.rect)  # Draw background
     if fullscreen:
-        screen.blit(background_graphics, screen_background_position)
         screen.blit(enter_nickname_m, enter_nickname_mR)
         display_score(player.score, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 12, '#FCFCF4',
                       font_100, screen)
         display_user_input_nickname(player_nickname, SCREEN_WIDTH / 2,
                                     SCREEN_HEIGHT / 3 + SCREEN_HEIGHT / 10, '#FCFCF4', font_100, screen)
     else:
-        screen.blit(background_graphics, screen_background_position)
         screen.blit(enter_nickname_mW, enter_nickname_mRW)
         display_scoreW(player.score, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 12, '#FCFCF4',
                        font_50, screen)
@@ -158,14 +152,14 @@ def incorrect_nickname_message(fullscreen, incorrect):
 
 # Leaderboard screen
 def leaderboard_screen(fullscreen):
+    background.update()  # Update background
+    screen.blit(background.image, background.rect)  # Draw background
     if fullscreen:
-        screen.blit(background_graphics, screen_background_position)
         screen.blit(leaderboard_m, leaderboard_mR)
         display_leader_board(SCREEN_WIDTH / 2 - SCREEN_WIDTH / 5 + SCREEN_WIDTH / 30, 300, '#FCFCF4',
                              player_score_map_output, font_75, screen)
         screen.blit(to_play_leaderboard_m, to_play_leaderboard_mR)
     else:
-        screen.blit(background_graphics, screen_background_position)
         screen.blit(leaderboard_mW, leaderboard_mRW)
         display_leader_boardW(SCREEN_WIDTH / 2 - SCREEN_WIDTH / 5 + SCREEN_WIDTH / 30, 135, '#FCFCF4',
                               player_score_map_output, font_35, screen)
@@ -300,7 +294,8 @@ while not game_over_flag:
                         game_first_run_flag = False
                         game_running_flag = True
     if game_running_flag:
-        screen.blit(background_graphics, screen_background_position)
+        background.update()  # Update background
+        screen.blit(background.image, background.rect)  # Draw background
         draw_sprites()
         update_sprites()
         gameplay_HUD(fullscreen_flag)
@@ -421,7 +416,7 @@ while not game_over_flag:
                 enemies.add(stardust)
                 adding_enemies_mutex.release()
 
-        if 220 * SECOND <= game_timer <= 225 * SECOND:
+        if 220 * SECOND <= game_timer <= 230 * SECOND:
             if fullscreen_flag:
                 screen.blit(warning_m, warning_mR)
                 screen.blit(boss_rush_announcement_m, boss_rush_announcement_mR)
@@ -429,7 +424,7 @@ while not game_over_flag:
                 screen.blit(warning_mW, warning_mRW)
                 screen.blit(boss_rush_announcement_mW, boss_rush_announcement_mRW)
 
-        if game_timer >= 225 * SECOND and not boss_rush_arrived_flag1:
+        if game_timer >= 235 * SECOND and not boss_rush_arrived_flag1:
             boss_rush_arrived_flag1 = True
             star_lord1 = Star_lord()
             adding_enemies_mutex.acquire()
@@ -448,7 +443,7 @@ while not game_over_flag:
             enemies.add(galactic_devourer1)
             adding_enemies_mutex.release()
 
-        if 165 * SECOND <= game_timer <= 270 * SECOND:
+        if 265 * SECOND <= game_timer <= 270 * SECOND:
             if fullscreen_flag:
                 screen.blit(warning_m, warning_mR)
                 screen.blit(boss_rush_announcement_m, boss_rush_announcement_mR)
