@@ -11,15 +11,15 @@ class Laser_thrower(Laser_type_weapon):
         super().__init__(center, damage_multiplier, fire_rate_multiplier)
 
         # Stats
-        self.damage = 0.1 * damage_multiplier
+        self.damage = 0.5 * damage_multiplier
         self.fire_rate = 60 * fire_rate_multiplier
         self.bullet_speed = 10 * SCALE
         self.range_timer_max = 1200 * SCALE
         self.range_timer_min = 0
 
         # Image data
-        self.width = 45 * SCALE
-        self.height = 45 * SCALE
+        self.width = 30 * SCALE
+        self.height = 25 * SCALE
         self.color = '#83EAFF'
 
         # Image
@@ -31,7 +31,7 @@ class Laser_thrower(Laser_type_weapon):
         self.rect.center = center
 
         # Audio
-        self.audio = pygame.mixer.Sound("Additional_resources/Audio/laser_thrower.mp3")
+        self.audio = pygame.mixer.Sound("Audio/laser_thrower.mp3")
         self.audio.set_volume(0.1)
         self.audio.play()
 

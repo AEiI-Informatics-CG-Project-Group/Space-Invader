@@ -11,7 +11,7 @@ class Minigun(Bullet_type_weapon):
         super().__init__(center, damage_multiplier, fire_rate_multiplier)
 
         # Stats
-        self.damage = 2 * damage_multiplier
+        self.damage = 12 * damage_multiplier
         self.fire_rate = 350 * fire_rate_multiplier
         self.bullet_speed = 20 * SCALE
 
@@ -29,6 +29,6 @@ class Minigun(Bullet_type_weapon):
         self.rect.center = center
 
         # Audio
-        self.audio = pygame.mixer.Sound("Additional_resources/Audio/minigun.mp3")
+        self.audio = pygame.mixer.Sound("Audio/minigun.mp3")
         self.audio.set_volume(0.5)
         self.audio.play()

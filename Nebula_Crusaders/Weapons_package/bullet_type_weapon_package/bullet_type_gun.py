@@ -43,7 +43,7 @@ class Bullet_type_weapon(Weapon):
         self.rect.center = center
 
         # Audio
-        self.boss_died_audio = pygame.mixer.Sound("Additional_resources/Audio/laser_rifle.mp3")
+        self.boss_died_audio = pygame.mixer.Sound("Audio/laser_rifle.mp3")
         self.boss_died_audio.set_volume(0.5)
 
     def movement_service(self):

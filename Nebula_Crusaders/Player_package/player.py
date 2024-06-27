@@ -1,6 +1,6 @@
 import pygame
 import threading
-
+import Constants_package.constants as c
 
 from Weapons_package.bullet_type_weapon_package.minigun import Minigun
 from Weapons_package.laser_type_weapon_package.laser_rifle import Laser_rifle
@@ -11,17 +11,22 @@ from Weapons_package.laser_type_weapon_package.laser_thrower import Laser_throwe
 
 from Constants_package.constants import guns, SCALE, SCREEN_WIDTH, SCREEN_HEIGHT, fullscreen_flag
 
-
 # Define the Player class
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        pygame.joystick.init()
+        self.num_joysticks = pygame.joystick.get_count()
+        self.joystick = None
+        if self.num_joysticks > 0:
+            self.joystick = pygame.joystick.Joystick(0)
+            self.joystick.init()
 
         # Stats
         self.gun_damage_multiplier = 1
         self.gun_fire_rate_multiplier = 1
         self.speed = 10 * SCALE
-        self.hp = 3
+        self.hp = 100
 
         # Info
         self.score = 0
@@ -43,18 +48,19 @@ class Player(pygame.sprite.Sprite):
         self.player_timer = 0
 
         # Image
-        self.image = pygame.image.load('Additional_resources/Graphics/player.png').convert_alpha()
+        self.image = pygame.image.load('Graphics/player.png').convert_alpha()
         if fullscreen_flag:
-            self.image = pygame.transform.scale(self.image, (200, 200))
+            self.image = pygame.transform.scale(self.image, (130, 130))
+            self.rect = self.image.get_rect()
         else:
             self.image = pygame.transform.scale(self.image, (100, 100))
-        self.rect = self.image.get_rect()
+            self.rect = self.image.get_rect()
 
         # Position
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT - SCREEN_HEIGHT / 10)
 
         # Audio
-        self.audio = pygame.mixer.Sound("Additional_resources/Audio/player.mp3")
+        self.audio = pygame.mixer.Sound("Audio/player.mp3")
         self.audio.set_volume(0.5)
         self.audio.play()
 
@@ -76,8 +82,8 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
-            if self.rect.right <= 0:
-                self.rect.left = SCREEN_WIDTH
+            if self.rect.left <= -50:
+                self.rect.right = SCREEN_WIDTH
         if keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
             if self.rect.left >= SCREEN_WIDTH:
@@ -91,45 +97,63 @@ class Player(pygame.sprite.Sprite):
             if self.rect.bottom >= SCREEN_HEIGHT:
                 self.rect.bottom = SCREEN_HEIGHT
 
+        if self.joystick:
+            axis_x = self.joystick.get_axis(c.PS_AXIS_LEFT_X)
+            axis_y = self.joystick.get_axis(c.PS_AXIS_LEFT_Y)
+            self.rect.x += int(axis_x * self.speed)
+            self.rect.y += int(axis_y * self.speed)
+            if self.rect.left <= -50:
+                self.rect.right = SCREEN_WIDTH
+            if self.rect.left >= SCREEN_WIDTH:
+                self.rect.left = 0
+            if self.rect.top <= 0:
+                self.rect.top = 0
+            if self.rect.bottom >= SCREEN_HEIGHT:
+                self.rect.bottom = SCREEN_HEIGHT
+
     def shooting_service(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and self.using_gun_type == 'Minigun' and self.player_timer <= 0:
+        shoot = keys[pygame.K_SPACE]
+
+        if self.joystick:
+            shoot |= self.joystick.get_button(c.PS_Cross)
+
+        if shoot and self.using_gun_type == 'Minigun' and self.player_timer <= 0:
             minigun = Minigun(self.rect.center, self.gun_damage_multiplier, self.gun_fire_rate_multiplier)
             self.player_shooting_mutex.acquire()
             guns.add(minigun)
             self.player_shooting_mutex.release()
             self.player_timer = minigun.fire_rate
 
-        if keys[pygame.K_SPACE] and self.using_gun_type == 'Laser Rifle' and self.player_timer <= 0:
+        if shoot and self.using_gun_type == 'Laser Rifle' and self.player_timer <= 0:
             laser_rifle = Laser_rifle(self.rect.center, self.gun_damage_multiplier, self.gun_fire_rate_multiplier)
             self.player_shooting_mutex.acquire()
             guns.add(laser_rifle)
             self.player_shooting_mutex.release()
             self.player_timer = laser_rifle.fire_rate
 
-        if keys[pygame.K_SPACE] and self.using_gun_type == 'Rocket Launcher' and self.player_timer <= 0:
-            rocket_launcher = Rocket_launcher(self.rect.center, self.gun_damage_multiplier,
-                                              self.gun_fire_rate_multiplier)
+        if shoot and self.using_gun_type == 'Rocket Launcher' and self.player_timer <= 0:
+            rocket_launcher = Rocket_launcher(self.rect.center, self.gun_damage_multiplier, self.gun_fire_rate_multiplier)
             self.player_shooting_mutex.acquire()
             guns.add(rocket_launcher)
             self.player_shooting_mutex.release()
             self.player_timer = rocket_launcher.fire_rate
 
-        if keys[pygame.K_SPACE] and self.using_gun_type == 'Laser Ring' and self.player_timer <= 0:
+        if shoot and self.using_gun_type == 'Laser Ring' and self.player_timer <= 0:
             laser_ring = Laser_ring(self.rect.center, self.gun_damage_multiplier, self.gun_fire_rate_multiplier)
             self.player_shooting_mutex.acquire()
             guns.add(laser_ring)
             self.player_shooting_mutex.release()
             self.player_timer = laser_ring.fire_rate
 
-        if keys[pygame.K_SPACE] and self.using_gun_type == 'Sniper Rifle' and self.player_timer <= 0:
+        if shoot and self.using_gun_type == 'Sniper Rifle' and self.player_timer <= 0:
             sniper_rifle = Sniper_rifle(self.rect.center, self.gun_damage_multiplier, self.gun_fire_rate_multiplier)
             self.player_shooting_mutex.acquire()
             guns.add(sniper_rifle)
             self.player_shooting_mutex.release()
             self.player_timer = sniper_rifle.fire_rate
 
-        if keys[pygame.K_SPACE] and self.using_gun_type == 'Laser Thrower' and self.player_timer <= 0:
+        if shoot and self.using_gun_type == 'Laser Thrower' and self.player_timer <= 0:
             laser_thrower = Laser_thrower(self.rect.center, self.gun_damage_multiplier, self.gun_fire_rate_multiplier)
             self.player_shooting_mutex.acquire()
             guns.add(laser_thrower)
@@ -140,6 +164,8 @@ class Player(pygame.sprite.Sprite):
 
     def gun_switching_service(self):
         keys = pygame.key.get_pressed()
+
+        # Keyboard weapon switching
         if keys[pygame.K_1] and self.minigun:
             self.using_gun_type = self.gun_list[0]
 
@@ -157,6 +183,26 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_6] and self.laser_thrower:
             self.using_gun_type = self.gun_list[5]
+
+        # Controller weapon switching
+        if self.joystick:
+            if self.joystick.get_button(c.PS_UP) and self.minigun:
+                self.using_gun_type = self.gun_list[0]
+
+            if self.joystick.get_button(c.PS_RIGHT) and self.laser_rifle:
+                self.using_gun_type = self.gun_list[1]
+
+            if self.joystick.get_button(c.PS_DOWN) and self.rocket_launcher:
+                self.using_gun_type = self.gun_list[2]
+
+            if self.joystick.get_button(c.PS_LEFT) and self.laser_ring:
+                self.using_gun_type = self.gun_list[3]
+
+            if self.joystick.get_button(c.PS_R1) and self.sniper_rifle:
+                self.using_gun_type = self.gun_list[4]
+
+            if self.joystick.get_button(c.PS_L1) and self.laser_thrower:
+                self.using_gun_type = self.gun_list[5]
 
     def update(self):
         self.movement_service()
