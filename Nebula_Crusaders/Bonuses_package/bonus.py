@@ -14,13 +14,12 @@ class Bonus(pygame.sprite.Sprite):
         self.score_bonus = 0
 
         # Image data
-        self.color = '#000000'
+
         self.height = 0 * SCREEN_HEIGHT / 800
         self.width = 0 * SCREEN_HEIGHT / 800
 
         # Image
         self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
         self.rect = self.image.get_rect()
 
         # Position

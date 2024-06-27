@@ -5,7 +5,7 @@ import random
 from Enemies_package.enemy import Enemy
 from Enemies_package.Enemy_gun_package.enemy_gun import Enemy_gun
 
-from Constants_package.constants import players, enemies_laser_guns, SCREEN_WIDTH, SCALE
+from Constants_package.constants import players, enemies_laser_guns, SCREEN_WIDTH, SCALE, fullscreen_flag
 
 
 # Define the Star_lord class
@@ -23,14 +23,13 @@ class Star_lord(Enemy):
         # Timer
         self.star_lord_timer = 0
 
-        # Image data
-        self.width = 120 * SCALE
-        self.height = 50 * SCALE
-        self.color = '#2EA33B'
 
         # Image
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+        self.image = pygame.image.load('Graphics/star_lord.png').convert_alpha()
+        if fullscreen_flag:
+            self.image = pygame.transform.scale(self.image, (136, 104))
+        else:
+            self.image = pygame.transform.scale(self.image, (106, 80))
         self.rect = self.image.get_rect()
 
         # Position
@@ -38,7 +37,7 @@ class Star_lord(Enemy):
         self.rect.y = 100 * SCALE
 
         # Audio
-        self.audio = pygame.mixer.Sound("Additional_resources/Audio/star_lord.mp3")
+        self.audio = pygame.mixer.Sound("Audio/star_lord.mp3")
         self.audio.set_volume(0.5)
         self.audio.play()
 
@@ -70,13 +69,9 @@ class Star_lord(Enemy):
 
     def range_attack_service(self):
         if self.star_lord_timer <= 0:
-            enemy_laser_gun = Enemy_gun(self.rect.center, 1.5, 2500, 10, 40, 65, "#FE1E1E")
+            enemy_laser_gun = Enemy_gun(self.rect.center, 1.5, 2500, 10, 25, 45, 'Graphics/laserRed.png')
             enemies_laser_guns.add(enemy_laser_gun)
             self.star_lord_timer = enemy_laser_gun.fire_rate
         self.star_lord_timer += -100
 
-    def hp_service(self):
-        if self.hp <= 60:
-            self.image.fill('#A3702E')
-        if self.hp <= 30:
-            self.image.fill('#A3402E')
+

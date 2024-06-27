@@ -5,7 +5,7 @@ import random
 from Enemies_package.enemy import Enemy
 from Enemies_package.Enemy_gun_package.galactic_devourer_laser_ring import Galactic_devourer_laser_ring
 
-from Constants_package.constants import players, enemies_laser_guns, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE
+from Constants_package.constants import players, enemies_laser_guns, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE, fullscreen_flag
 
 
 # Define the Galactic_devourer class
@@ -31,14 +31,12 @@ class Galactic_devourer(Enemy):
         self.galactic_devourer_overheating_timer_2 = 20000
         self.overheating_passed = True
 
-        # Image data
-        self.width = 100 * SCALE
-        self.height = 100 * SCALE
-        self.color = '#EE2659'
-
         # Image
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+        self.image = pygame.image.load('Graphics/galactic_devourer.png').convert_alpha()
+        if fullscreen_flag:
+            self.image = pygame.transform.scale(self.image, (220, 195))
+        else:
+            self.image = pygame.transform.scale(self.image, (172, 151))
         self.rect = self.image.get_rect()
 
         # Position
@@ -46,7 +44,7 @@ class Galactic_devourer(Enemy):
         self.rect.y = 200 * SCALE
 
         # Audio
-        self.audio = pygame.mixer.Sound("Additional_resources/Audio/galactic_devourer.mp3")
+        self.audio = pygame.mixer.Sound("Audio/galactic_devourer.mp3")
         self.audio.set_volume(0.5)
         self.audio.play()
 
@@ -71,8 +69,8 @@ class Galactic_devourer(Enemy):
         if self.galactic_devourer_overheating_timer <= self.galactic_devourer_overheating_timer_max:
 
             if self.galactic_devourer_timer <= 0:
-                galactic_devourer_laser_ring = Galactic_devourer_laser_ring(self.rect.center, 1, 200, 15, 250, 250,
-                                                                            "#FF05D5")
+                galactic_devourer_laser_ring = Galactic_devourer_laser_ring(self.rect.center, 1, 200, 15, 200, 200,
+                                                                            'Graphics/shield.png')
                 enemies_laser_guns.add(galactic_devourer_laser_ring)
                 self.galactic_devourer_timer = galactic_devourer_laser_ring.fire_rate
                 self.acceleration = 6
@@ -88,8 +86,3 @@ class Galactic_devourer(Enemy):
 
             self.galactic_devourer_overheating_timer_2 += 100
 
-    def hp_service(self):
-        if self.hp <= 400:
-            self.image.fill('#A3702E')
-        if self.hp <= 200:
-            self.image.fill('#A3402E')

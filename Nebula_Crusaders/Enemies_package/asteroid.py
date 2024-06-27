@@ -4,7 +4,7 @@ import random
 
 from Enemies_package.enemy import Enemy
 
-from Constants_package.constants import players, enemies, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE
+from Constants_package.constants import players, enemies, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE, fullscreen_flag
 
 
 # Define the Asteroid class
@@ -17,11 +17,6 @@ class Asteroid(Enemy):
         self.speed_x = 0 * SCALE
         self.speed_y = random.randrange(3, 5) * SCALE
         self.damage = 1
-
-        # Image data
-        self.width = 50 * SCALE
-        self.height = 50 * SCALE
-        self.color = '#FCDDDC'
 
         # Image
         self.image = pygame.Surface([self.width, self.height])
@@ -39,14 +34,12 @@ class Asteroid(Enemy):
         self.speed_y = random.randrange(3, 5) * SCALE
         self.damage = 1
 
-        # Image data
-        self.width = 50 * SCALE
-        self.height = 50 * SCALE
-        self.color = '#FCDDDC'
-
         # Image
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+        self.image = pygame.image.load('Graphics/meteor.png').convert_alpha()
+        if fullscreen_flag:
+            self.image = pygame.transform.scale(self.image, (180, 240))
+        else:
+            self.image = pygame.transform.scale(self.image, (120, 160))
         self.rect = self.image.get_rect()
 
         # Position
@@ -73,25 +66,7 @@ class Asteroid(Enemy):
                     player.kill()
 
     def hp_service(self):
-        if self.hp <= 12:
-            new_width = int(self.width * 0.8)
-            new_height = int(self.height * 0.8)
-            old_center = self.rect.center
-
-            self.image = pygame.transform.scale(self.image, (new_width, new_height))
-            self.rect = self.image.get_rect()
-            self.rect.center = old_center
-            self.image.fill('#C1B5B5')
-
-        if self.hp <= 6:
-            new_width = int(self.width * 0.7)
-            new_height = int(self.height * 0.7)
-            old_center = self.rect.center
-
-            self.image = pygame.transform.scale(self.image, (new_width, new_height))
-            self.rect = self.image.get_rect()
-            self.rect.center = old_center
-            self.image.fill('#696161')
+      pass
 
     def update(self):
         self.movement_service()

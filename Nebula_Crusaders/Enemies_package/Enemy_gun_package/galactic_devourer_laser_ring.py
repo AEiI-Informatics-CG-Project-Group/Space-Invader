@@ -6,14 +6,14 @@ from Constants_package.constants import players, SCALE
 
 
 class Galactic_devourer_laser_ring(Enemy_gun):
-    def __init__(self, center, damage, fire_rate, bullet_speed, width, height, color):
-        super().__init__(center, damage, fire_rate, bullet_speed, width, height, color)
+    def __init__(self, center, damage, fire_rate, bullet_speed, width, height, image_file):
+        super().__init__(center, damage, fire_rate, bullet_speed, width, height, image_file)
 
         self.range_timer_max = 150 * SCALE
         self.range_timer_min = 0
 
         # Audio
-        self.audio = pygame.mixer.Sound("Additional_resources/Audio/devourer_gun.mp3")
+        self.audio = pygame.mixer.Sound("Audio/devourer_gun.mp3")
         self.audio.set_volume(0.5)
         self.audio.play()
 

@@ -3,7 +3,7 @@ import random
 
 
 from Enemies_package.enemy import Enemy
-from Constants_package.constants import players, enemies, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE
+from Constants_package.constants import players, enemies, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE, fullscreen_flag
 
 
 # Define the Stardust class
@@ -17,14 +17,12 @@ class Stardust(Enemy):
         self.speed_y = random.randrange(2, 5) * SCALE
         self.damage = 0.1
 
-        # Image data
-        self.width = 15 * SCALE
-        self.height = 15 * SCALE
-        self.color = '#9C9C92'
-
         # Image
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+        self.image = pygame.image.load('Graphics/boom09.png').convert_alpha()
+        if fullscreen_flag:
+            self.image = pygame.transform.scale(self.image, (25, 25))
+        else:
+            self.image = pygame.transform.scale(self.image, (15, 15))
         self.rect = self.image.get_rect()
 
         # Position
@@ -48,11 +46,7 @@ class Stardust(Enemy):
                     player.kill()
 
     def hp_service(self):
-        if self.hp <= 50:
-            self.image.fill('#DEA0A0')
-
-        if self.hp <= 20:
-            self.image.fill('#B25959')
+        pass
 
     def update(self):
         self.movement_service()

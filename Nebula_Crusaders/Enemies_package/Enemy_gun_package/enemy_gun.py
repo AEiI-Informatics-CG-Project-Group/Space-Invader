@@ -1,11 +1,9 @@
 import pygame
 
-
 from Constants_package.constants import players, enemies_laser_guns, SCREEN_HEIGHT, SCALE
 
-
 class Enemy_gun(pygame.sprite.Sprite):
-    def __init__(self, center, damage, fire_rate, bullet_speed, width, height, color):
+    def __init__(self, center, damage, fire_rate, bullet_speed, width, height, image_file):
         super().__init__()
 
         # Stats
@@ -16,18 +14,17 @@ class Enemy_gun(pygame.sprite.Sprite):
         # Image data
         self.width = width * SCALE
         self.height = height * SCALE
-        self.color = color
 
-        # Image
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+        # Load image instead of creating a surface
+        self.image = pygame.image.load(image_file).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
         self.rect = self.image.get_rect()
 
         # Position
         self.rect.center = center
 
         # Audio
-        self.audio = pygame.mixer.Sound("Additional_resources/Audio/enemy_laser_gun.mp3")
+        self.audio = pygame.mixer.Sound("Audio/enemy_laser_gun.mp3")
         self.audio.set_volume(0.5)
         self.audio.play()
 

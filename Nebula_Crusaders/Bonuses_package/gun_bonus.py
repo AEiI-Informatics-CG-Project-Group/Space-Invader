@@ -3,7 +3,7 @@ import pygame
 
 from Bonuses_package.bonus import Bonus
 
-from Constants_package.constants import players, SCALE
+from Constants_package.constants import players, SCALE, fullscreen_flag
 
 
 # Define the Gun_bonus class
@@ -16,13 +16,15 @@ class Gun_bonus(Bonus):
         self.score_bonus = 150
 
         # Image data
-        self.color = '#5100FF'
         self.height = 45 * SCALE
         self.width = 65 * SCALE
 
         # Image
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+        self.image = pygame.image.load('Graphics/gun_bonus.png').convert_alpha()
+        if fullscreen_flag:
+            self.image = pygame.transform.scale(self.image, (60, 80))
+        else:
+            self.image = pygame.transform.scale(self.image, (30, 40))
         self.rect = self.image.get_rect()
 
         # Position

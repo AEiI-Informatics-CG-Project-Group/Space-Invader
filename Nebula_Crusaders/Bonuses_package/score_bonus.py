@@ -3,7 +3,7 @@ import pygame
 
 from Bonuses_package.bonus import Bonus
 
-from Constants_package.constants import players, SCALE
+from Constants_package.constants import players, SCALE, fullscreen_flag
 
 
 # Define the Score_bonus class
@@ -16,13 +16,13 @@ class Score_bonus(Bonus):
         self.score_bonus = 50
 
         # Image data
-        self.color = '#A6E742'
-        self.height = 30 * SCALE
-        self.width = 30 * SCALE
 
         # Image
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+        self.image = pygame.image.load('Graphics/score_bonus.png').convert_alpha()
+        if fullscreen_flag:
+            self.image = pygame.transform.scale(self.image, (62, 60))
+        else:
+            self.image = pygame.transform.scale(self.image, (31, 30))
         self.rect = self.image.get_rect()
 
         # Position

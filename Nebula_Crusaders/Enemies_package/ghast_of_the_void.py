@@ -4,7 +4,7 @@ import pygame
 from Enemies_package.enemy import Enemy
 from Enemies_package.Enemy_gun_package.enemy_gun import Enemy_gun
 
-from Constants_package.constants import players, enemies, enemies_laser_guns, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE
+from Constants_package.constants import players, enemies, enemies_laser_guns, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE, fullscreen_flag
 
 
 # Define the Ghast_of_the_void class
@@ -24,13 +24,14 @@ class Ghast_of_the_void(Enemy):
         self.ghast_of_the_void_timer = 0
 
         # Image data
-        self.width = 45 * SCALE
-        self.height = 70 * SCALE
-        self.color = '#652EA3'
+
 
         # Image
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+        self.image = pygame.image.load('Graphics/ghast_of_the_void.png').convert_alpha()
+        if fullscreen_flag:
+            self.image = pygame.transform.scale(self.image, (122, 190))
+        else:
+            self.image = pygame.transform.scale(self.image, (94, 148))
         self.rect = self.image.get_rect()
 
         # Position
@@ -39,7 +40,7 @@ class Ghast_of_the_void(Enemy):
         self.rect.center = (self.pos_x, self.pos_y)
 
         # Audio
-        self.audio = pygame.mixer.Sound("Additional_resources/Audio/ghast_of_the_void.mp3")
+        self.audio = pygame.mixer.Sound("Audio/ghast_of_the_void.mp3")
         self.audio.set_volume(0.5)
         self.audio.play()
 
@@ -78,13 +79,8 @@ class Ghast_of_the_void(Enemy):
 
     def range_attack_service(self):
         if self.ghast_of_the_void_timer <= 0:
-            enemy_laser_gun = Enemy_gun(self.rect.center, 0.2, 2000, 15, 15, 45, "#FE1E1E")
+            enemy_laser_gun = Enemy_gun(self.rect.center, 0.2, 2000, 15, 15, 35, 'Graphics/laserRed.png')
             enemies_laser_guns.add(enemy_laser_gun)
             self.ghast_of_the_void_timer = enemy_laser_gun.fire_rate
         self.ghast_of_the_void_timer += -100
 
-    def hp_service(self):
-        if self.hp <= 100:
-            self.image.fill('#A3702E')
-        if self.hp <= 50:
-            self.image.fill('#A3402E')

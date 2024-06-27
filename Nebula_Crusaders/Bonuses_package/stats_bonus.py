@@ -4,7 +4,7 @@ import random
 
 from Bonuses_package.bonus import Bonus
 
-from Constants_package.constants import players, SCALE
+from Constants_package.constants import players, SCALE, fullscreen_flag
 
 
 # Define the Stats_bonus class
@@ -17,25 +17,29 @@ class Stats_bonus(Bonus):
         self.score_bonus = 50
 
         # Image data
-        self.color = '#000000'
-        self.color_damage_up = '#F3A31F'
-        self.color_fire_rate_up = '#F3DA1F'
-        self.color_speed_up = '#1FF3D3'
-        self.height = 45 * SCALE
-        self.width = 45 * SCALE
 
         # Image
-        self.image = pygame.Surface([self.width, self.height])
+        self.image_damage_up = pygame.image.load('Graphics/damage_bonus.png').convert_alpha()
+        self.image_fire_rate_up = pygame.image.load('Graphics/fire_rate_bonus.png').convert_alpha()
+        self.image_speed_up = pygame.image.load('Graphics/speed_bonus.png').convert_alpha()
+        if fullscreen_flag:
+            self.image_damage_up = pygame.transform.scale(self.image, (62, 60))
+            self.image_fire_rate_up = pygame.transform.scale(self.image, (62, 60))
+            self.image_speed_up = pygame.transform.scale(self.image, (62, 60))
+        else:
+            self.image_damage_up = pygame.transform.scale(self.image, (31, 30))
+            self.image_fire_rate_up = pygame.transform.scale(self.image, (31, 30))
+            self.image_speed_up = pygame.transform.scale(self.image, (31, 30))
         self.rect = self.image.get_rect()
 
         # Set bonus
         self.bonus_type = random.randint(1, 3)
         if self.bonus_type == 1:
-            self.image.fill(self.color_damage_up)
+            self.image_damage_up = pygame.image.load('Graphics/damage_bonus.png').convert_alpha()
         if self.bonus_type == 2:
-            self.image.fill(self.color_fire_rate_up)
+            self.image_fire_rate_up = pygame.image.load('Graphics/fire_rate_bonus.png').convert_alpha()
         if self.bonus_type == 3:
-            self.image.fill(self.color_speed_up)
+            self.image_speed_up = pygame.image.load('Graphics/speed_bonus.png').convert_alpha()
 
         # Position
         self.rect.center = center

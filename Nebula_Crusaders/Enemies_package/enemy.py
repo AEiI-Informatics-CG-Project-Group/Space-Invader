@@ -22,7 +22,7 @@ class Enemy(pygame.sprite.Sprite):
 
         # Image
         self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(self.color)
+
         self.rect = self.image.get_rect()
 
         # Position
